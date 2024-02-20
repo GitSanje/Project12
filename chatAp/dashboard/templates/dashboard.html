@@ -1,0 +1,68 @@
+{% extends "dashboard/home.html" %}
+{% block content %}
+ <div class="container-fluid" style="margin-top: 100px;">
+    <div class="row justify-content-center">
+        <div class="col-md-9 pb-5">
+            <div class="card profile shadow">
+                <div class="card-body text-center">
+                    <h2>Welcome to MindChat</h2>
+                    <p>"Chat with friends and keep track of how you feel every day at MindChat –
+                        <br>where great talks happen, and you get to know yourself better!"</p>
+                </div>
+                <div class="text-center mx-auto">
+                    <canvas id="sentimentChart" style="max-width: 100%; height: 300px;"></canvas>
+
+                     {% if pos > neg %}
+                        <p>"The overall sentiment is positive.
+                        <br> It seems like your mental health is good today.
+                        <br> Keep taking care of your well-being."</p>
+                    {% elif neg > pos %}
+                        <p>"The overall sentiment is negative.
+                        <br> It seems like your mental health might be affected today.
+                        <br> Consider consulting with an expert."</p>
+                    {% else %}
+                        <p>"The overall sentiment is neutral.
+                        <br> Keep track of your feelings and take care of yourself."</p>
+                    {% endif %}
+                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function() {
+                            var ctx = document.getElementById('sentimentChart').getContext('2d');
+                            var myChart = new Chart(ctx, {
+                                type: 'bar',
+                                data: {
+                                    labels: ['Positive', 'Negative'],
+                                    datasets: [{
+                                        label: 'Sentiment Analysis',
+                                        data: [
+                                            {{ pos }},
+                                           {{ neg }}
+                                        ],
+                                        backgroundColor: [
+                                            'rgba(75, 192, 192, 0.2)',
+                                            'rgba(255, 99, 132, 0.2)'
+                                        ],
+                                        borderColor: [
+                                            'rgba(75, 192, 192, 1)',
+                                            'rgba(255, 99, 132, 1)'
+                                        ],
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true
+                                        }
+                                    },
+
+                                }
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

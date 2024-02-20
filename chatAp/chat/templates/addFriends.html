@@ -1,0 +1,40 @@
+{% extends "dashboard/home.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container-fluid" style="margin-top: 100px;">
+    <div class="row justify-content-center">
+        <div class="col-md-8 pb-5">
+            <div class="card profile shadow">
+                <div class="card-body">
+                   <h3>Add a friend</h3>
+                    <input id="searchInput" type="text" class="form-control mb-3" placeholder="Search...">
+
+
+                    <hr>
+                    {% for other_user in all_users %}
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                          <a href="{% url 'other_user_profile' other_user.id %}">
+                        <div class="d-flex align-items-center">
+                            <img class="rounded-circle account-img mr-3" src="{{ other_user.profile.image.url }}" alt="{{ other_user.username }}" style="width: 40px; height: 40px;">
+                            <div>
+                                <span class="username">{{ other_user.full_name }}</span>
+                                <p>{{ other_user.profile.bio }}</p>
+                            </div>
+                               </div>
+                               </a>
+                        <div>
+                            {% if other_user in friends %}
+                            <span class="text-success">Friend <i class="fas fa-check"></i></span>
+                            {% else %}
+                            <span class="text-danger">Not Friend <i class="fas fa-times"></i> </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

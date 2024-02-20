@@ -1,0 +1,53 @@
+{% extends "dashboard/home.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container-fluid" style="margin-top: 100px;">
+    <div class="row justify-content-center">
+        <div class="col-md-8 pb-5">
+            <div class="card profile shadow">
+                <div class="card-body">
+                   <h3>All requests</h3>
+                    <hr>
+                    {% if all_requests %}
+                        {% for req in all_requests %}
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="d-flex align-items-center">
+                                <img class="rounded-circle account-img mr-3" src="{{ req.from_user.profile.image.url }}" alt="{{ req.from_user.username }}" style="width: 40px; height: 40px;">
+                                <div>
+                                    <span class="username">{{ req.from_user.full_name }}</span>
+                                    <p>{{ req.from_user.profile.bio }}</p>
+                                </div>
+                            </div>
+                            <div class="btn-group" role="group">
+                                <form id="friend-request-form" action="{% url 'accept_friend_request' req.from_user.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-success">
+                                        Accept <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                                <form action="{% url 'reject_friend_request' req.from_user.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-outline-danger">
+                                        Reject <i class="fas fa-minus"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h5 class="panel-title">No Friend Requests</h5>
+                        </div>
+                        <div class="panel-body">
+                            There are currently no friend requests.
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

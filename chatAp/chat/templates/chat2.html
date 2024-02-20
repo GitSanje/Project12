@@ -1,0 +1,210 @@
+{% extends "dashboard/home.html" %}
+{% load static %}
+{% load tz %}
+{% block content %}
+<input type="hidden" id="logged-in-user" value="{{ user.id }}" />
+<div class="container-fluid" style="margin-top: 100px">
+  <div class="container pb-5">
+    <div class="card shadow pb-5">
+      <div class="row g-0">
+             <div class="col-12 col-lg-5 col-xl-3 border-right">
+          <div class="px-4 d-md-block">
+            <div class="d-flex align-items-center">
+              <div class="flex-grow-1">
+                <input id="searchInput"
+                  type="text"
+                  class="form-control my-3"
+                  placeholder="Search..."
+                  oninput="searchFunction()"
+                />
+              </div>
+            </div>
+
+            <div
+              class="d-flex flex-md-row flex-lg-column"
+              style="overflow-x: auto;hidden;max-height: 800px;"
+            >
+              <ui class="contacts">
+              {% for thread in threads %}
+                   <li class="{% if forloop.first %}active{% endif %} contact-li" chat-id="chat_{{ thread.id }}" user-id="{{ thread.first_person.id }}" style="cursor: pointer">
+                    <div class="d-flex  align-items-center sm-sidebar ">
+                      <img
+                        src="  {% if thread.first_person == user %}
+                                        {{ thread.second_person.profile.image.url}}
+                                {% else %}
+                                      {{ thread.first_person.profile.image.url }}
+                                {% endif %} "
+                        class="rounded-circle mr-1"
+                        width="40"
+                        height="40"
+                      />
+
+                      <div class="flex-grow-1 ml-3">
+                        {% if thread.first_person == user %}
+                            {{ thread.second_person}}
+                        {% else %}
+                            {{ thread.first_person }}
+                        {% endif %}
+                      </div>
+                    </div>
+                   </li>
+
+              {% endfor %}
+                </ui>
+
+
+
+            </div>
+          </div>
+                   <div class="flex-grow-0 py-2 px-4 border-top">
+    <a href="{% url 'add_friends' %}" class="btn btn-outline-info full-width-btn">Add Friend</a>
+    </div>
+
+               <hr class="d-block d-lg-none mt-1 mb-1" />
+        </div>
+
+
+        <div class="col-12 col-lg-7 col-xl-9 pb-3">
+          {% for thread in threads %}
+           <div class="messages-wrapper  {% if forloop.first %} hide is_active{% else %}hide{% endif %} " chat-id="chat_{{ thread.id }}" other-user-id="
+                                        {% if thread.first_person == user %}
+                                            {{ thread.second_person.id }}
+                                        {% else %}
+                                            {{ thread.first_person.id }}
+                                        {% endif %}
+                                    ">
+                  <div class="py-2 px-4 border-bottom  d-lg-block">
+
+
+                  <div class="d-flex align-items-center py-1">
+
+                    <div class="position-relative">
+
+
+                        <img
+                          src="{% if thread.first_person == user %}
+                                            {{ thread.second_person.profile.image.url}}
+                                    {% else %}
+                                          {{ thread.first_person.profile.image.url }}
+                                    {% endif %}"
+                          class="rounded-circle mr-1"
+                          alt="{% if thread.first_person == user %}
+                                            {{ thread.second_person}}
+                                    {% else %}
+                                          {{ thread.first_person }}
+                                    {% endif %}"
+                          width="40"
+                          height="40"
+                        />
+                      </div>
+                      <div class="flex-grow-1 pl-3">
+                        <strong>
+                          {% if thread.first_person == user %}
+                             {{ thread.second_person.full_name}}
+                          {% else %}
+                             {{thread.first_person.full_name }}
+                          {% endif %}
+                        </strong>
+                      </div>
+
+                    {% if thread.first_person == user %}
+                          <button onclick="reloadPageAndRedirect('{% url 'chat_sentiments' thread.second_person.id %}')" class="btn btn-info btn-lg mr-1 px-3">
+                            <div><i class="fas fa-chart-line analyze-icon"></i></div>
+                        </button>
+                    {% else %}
+                        <button onclick="reloadPageAndRedirect('{% url 'chat_sentiments' thread.first_person.id %}')" class="btn btn-info btn-lg mr-1 px-3">
+                            <div><i class="fas fa-chart-line analyze-icon"></i></div>
+                        </button>
+                    {% endif %}
+
+
+
+
+
+
+                    </div>
+                   </div>
+
+                  <div class="position-relative  msg_card_body">
+                     <div class="chat-messages p-4 ">
+
+                        {% for chat in thread.chatmessage_thread.all %}
+
+                          {% if chat.user == user %}
+
+                              <div class="chat-message-right pb-4">
+                                <div>
+                                  <img
+                                    src="{{ user.profile.image.url }}"
+                                    class="rounded-circle mr-1"
+                                    alt="{{ user.username }}"
+                                    width="40"
+                                    height="40"
+                                  />
+                                  <div class="text-muted small text-nowrap mt-2">
+                                      {% timezone "Asia/Kathmandu" %}
+                                       {{ chat.timestamp|timezone:"Asia/Kathmandu"|date:"d M" }}, {{ chat.timestamp|timezone:"Asia/Kathmandu"|time:"H:i" }}
+                                 {% endtimezone %}
+                                  </div>
+                                </div>
+                                <div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">
+                                  <div class="font-weight-bold mb-1">You</div>
+                                  {{ chat.message }}
+                                </div>
+                              </div>
+                          {% else %}
+                          <div class="chat-message-left pb-4">
+                            <div>
+                              <img
+                                src="{{ chat.user.profile.image.url }}"
+                                class="rounded-circle mr-1"
+                                alt="{{chat.user.username }}"
+                                width="40"
+                                height="40"
+                              />
+                              <div class="text-muted small text-nowrap mt-2">
+                                {% timezone "Asia/Kathmandu" %}
+                                 {{ chat.timestamp|timezone:"Asia/Kathmandu"|date:"d M" }},{{ chat.timestamp|timezone:"Asia/Kathmandu"|time:"H:i" }}
+                                 {% endtimezone %}
+                              </div>
+                            </div>
+                            <div class="flex-shrink-1 bg-light rounded py-2 px-3 mr-3">
+                              <div class="font-weight-bold mb-1">
+                                {{chat.user.full_name }}
+                              </div>
+                              {{ chat.message }}
+                            </div>
+                          </div>
+
+                          {% endif %}
+
+                       {% endfor %}
+
+                    </div>
+                  </div>
+           </div>
+
+
+             {% endfor %}
+               <div class="flex-grow-0 py-2 px-4 border-top ">
+              <form id="send-message-form">
+
+                <div class="input-group">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="input-message"
+                    placeholder="Type your message..."
+                  />
+                  <button class="btn btn-info">Send</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% endblock %}
+

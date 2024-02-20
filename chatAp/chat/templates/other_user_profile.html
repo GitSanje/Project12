@@ -1,0 +1,56 @@
+{% extends "dashboard/home.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="container-fluid " style="margin-top: 100px;">
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 pb-5">
+
+            <div class="card profile shadow">
+
+                <div class="card-body">
+                 <a href="{% url 'add_friends' %}" class="btn btn-outline-info mb-3">
+                     <i class="fas fa-arrow-left mr-2"></i> Back
+                 </a>
+                    <div class="d-flex">
+                        <img class="rounded-circle account-img mr-3" src="{{ other_user.profile.image.url }}" alt="{{ other_user.username }}">
+                        <div>
+                            <h3 class="mt-2">{{ other_user.full_name }}</h3>
+                            <p class="text-muted mb-1">{{ other_user.email }}</p>
+                            <p class="text-muted mb-1">Bio: {{ other_user.profile.bio }}</p>
+                        </div>
+                        <div class="dark-box mt-3 p-3 ml-auto">
+                            {% if are_friends %}
+                            <p class="text-light p-1 ">
+                               Your friend  <i class="fas fa-user-check"></i>
+                            </p>
+                            {% else %}
+                           <form id="friend-request-form" action="{% if frequest %}{% url 'cancel_friend_request' other_user.id %}{% else %}{% url 'friend_request_send' other_user.id %}{% endif %}" method="post">
+                                {% csrf_token %}
+                                {% if frequest %}
+                                    <button id="friend-request-button1" type="submit" class="btn btn-outline-danger">
+                                        Cancel friend request <i class="fas fa-user-minus"></i>
+                                    </button>
+                                {% else %}
+                                    <button id="friend-request-button" type="submit" class="btn btn-outline-info">
+                                        Send friend request <i class="fas fa-user-plus"></i>
+                                    </button>
+                                {% endif %}
+                            </form>
+
+
+                            {% endif %}
+                            <p class="text-light d-flex flex-column p-1">
+                                <span> Friends <i class="fas fa-user-friends"></i></span>
+                                <span class="text-light ">( {{ friends_count }} )</span>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
